@@ -1,0 +1,37 @@
+const addReservation = '''
+mutation addReservation(\$user_id:ID,\$reservationInput:ReservationInput){
+  addReservation(user_id:\$user_id,reservationInput:\$reservationInput){
+    date
+    time
+    pickup
+    pickup_latitude
+    pickup_longitude
+    stop
+    stop_latitude
+    stop_longitude
+    dropoff
+    dropoff_latitude
+    dropoff_longitude
+    first_name
+    last_name
+    phone_number
+    price
+    reservation_id
+    reservation_temperature
+    reservation_play
+    reservation_bag
+    reservation_drink
+    vehicle_id
+    receipt_number
+    distance
+    vehicle_make{
+      vehicle_make
+      vehicle_model
+      capacity
+      vehicle_logo
+      initial_trip_fare
+      reservation_vehicle_make_id
+    }
+  }
+}
+''';
