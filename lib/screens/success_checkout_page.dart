@@ -73,12 +73,11 @@ class SuccessCheckoutPage extends StatelessWidget {
                     Text(
                       'Reserved!',
                       style: GoogleFonts.inter(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w300,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
                         letterSpacing: 0.6,
                       ),
                     ),
-                    
                     SizedBox(
                       height: height * 2,
                     ),

@@ -15,3 +15,18 @@ query getVehicleList($user_id:ID){
   }
 }
 ''';
+
+String reservationSavedVehicleQuery = '''
+  query GetReservationSavedVehicle(\$userId: ID) {
+    getReservationSavedVehicle(user_id: \$userId) {
+      reservation_vehicle_make_id
+      vehicle_make
+      vehicle_model
+      capacity
+      service_fee
+      driver_commission
+      initial_trip_fare
+      vehicle_logo
+    }
+  }
+''';

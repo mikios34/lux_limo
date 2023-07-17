@@ -10,6 +10,7 @@ import 'package:beyride/screens/home/widget/bottom_nav.dart';
 import 'package:beyride/screens/home/widget/location_search_result.dart';
 import 'package:beyride/screens/home/widget/recent_locations.dart';
 import 'package:beyride/screens/home/widget/saved_addresses.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -31,7 +32,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -71,8 +72,7 @@ class HomePage extends StatelessWidget {
                           }
 
                           if (result.hasException) {
-                            return Center(
-                                child: Text("Excpetion ${result.exception}"));
+                            return ErrorPage(refetch: refetch);
                           }
                           final data = result.data![
                               'getReservationUpcomingAndAddressInformation'];
@@ -107,15 +107,22 @@ class HomePage extends StatelessWidget {
                           return Container();
                         },
                       ),
+                      const SizedBox(
+                        height: 25,
+                      ),
                       AirPorts(),
                     ],
                   ),
                 );
               }),
             ),
-            BottomNav()
+            // BottomNav()
           ],
         ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: BottomNav(),
       ),
     );
   }

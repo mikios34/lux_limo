@@ -1,8 +1,11 @@
 import 'package:beyride/api/vehicle/query.dart';
 import 'package:beyride/controller/bottomsheet_controller.dart';
 import 'package:beyride/model/vehicle_make/vehicle_make.dart';
+import 'package:beyride/screens/home/home_controller.dart';
 import 'package:beyride/screens/saved_vehicles.dart';
+import 'package:beyride/screens/search_vehicle.dart';
 import 'package:beyride/screens/vehicles.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:beyride/widget/date_bottomsheet.dart';
 import 'package:beyride/widget/preference_bottomsheet.dart';
 import 'package:beyride/widget/preference_bottomsheets/bag_bottomsheet.dart';
@@ -13,11 +16,12 @@ import 'package:beyride/widget/reserve_bottomsheet.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class VehicleCategory extends StatefulWidget {
-  VehicleCategory({super.key});
+  const VehicleCategory({super.key});
 
   @override
   State<VehicleCategory> createState() => _VehicleCategoryState();
@@ -26,6 +30,7 @@ class VehicleCategory extends StatefulWidget {
 class _VehicleCategoryState extends State<VehicleCategory> {
   // final image =
   late List<VehicleMake> vehicles = [];
+  final homePageController = Get.put(HomePageController());
 
   // int currentIndex = 0;
   final bottomSheetController = Get.put(BottomSheetController());
@@ -34,45 +39,56 @@ class _VehicleCategoryState extends State<VehicleCategory> {
   Widget build(BuildContext context) {
     // int currentIndex = 0;
 
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 70,
-        elevation: 0,
+    return WillPopScope(
+      onWillPop: () async {
+        homePageController.resetHomePage();
+        return true;
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        title: Text(
-          "Select Vehicle",
-          style: GoogleFonts.inter(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
-        ),
-        leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-              color: Colors.black,
-            )),
-        actions: [
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                FeatherIcons.search,
-                color: Colors.black,
-                size: 18,
-              )),
-          IconButton(
+        appBar: AppBar(
+          toolbarHeight: 70,
+          elevation: 0,
+          backgroundColor: Colors.white,
+          // title: Text(
+          //   "Select Vehicle",
+          //   style: GoogleFonts.inter(
+          //       color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
+          // ),
+          leading: IconButton(
               onPressed: () {
-                Get.to(() => SavedVehicles(
-                      vehicles: vehicles,
-                    ));
+                homePageController.resetHomePage();
+
+                Get.back();
               },
-              icon: Icon(Icons.favorite_outline))
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Query(
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.black,
+              )),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Get.to(() => const SearchVehicle());
+                },
+                icon: const Icon(
+                  FeatherIcons.search,
+                  color: Colors.black,
+                  size: 18,
+                )),
+            IconButton(
+                onPressed: () {
+                  Get.to(() => const SavedVehicles());
+                },
+                icon: const Icon(
+                  FeatherIcons.heart,
+                  size: 18,
+                ))
+          ],
+        ),
+        body: Query(
             options: QueryOptions(
-                document: gql(getVehicleList), variables: const {"user_id": 1}),
+                document: gql(getVehicleList),
+                variables: {"user_id": GetStorage().read('uid')}),
             builder: (result, {fetchMore, refetch}) {
               if (result.isLoading) {
                 return const Center(
@@ -83,24 +99,23 @@ class _VehicleCategoryState extends State<VehicleCategory> {
               }
 
               if (result.hasException) {
-                return Center(
-                  child: Text("Error ${result.exception}"),
-                );
+                return ErrorPage(refetch: refetch);
               }
-              vehicles = (result.data!['getVehicleList'] as List)
+              final fromvehicles = (result.data!['getVehicleList'] as List)
                   .map((e) => VehicleMake.fromJson(e))
                   .toList();
-              final hightlyRatedV = vehicles
+              final hightlyRatedV = fromvehicles
                   .where((element) => element.isHighlyRated == true)
                   .toList();
               final modified = hightlyRatedV
                   .map((e) => e.copyWith(vehicleMake: "Highly Rated"))
                   .toList();
-              vehicles.addAll(modified);
+              // vehicles.addAll(modified);
+              vehicles = [...modified, ...fromvehicles];
 
               final cats = categorizeVehicles(vehicles).keys.toList();
               final catV = categorizeVehicles(vehicles).values.toList();
-              return Column(
+              return ListView(
                   children: List.generate(
                       categorizeVehicles(vehicles).keys.length, (index) {
                 return _buildVehicleCategory(
@@ -150,33 +165,33 @@ class _VehicleCategoryState extends State<VehicleCategory> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5.0),
             child: TextButton(
               onPressed: () {
                 Get.to(() => Vehicles(
-                      vehicles: allVs,
                       categories: categories,
                       currentCat: category,
-                      refetch: refetch,
                     ));
               },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    category,
-                    style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.black,
-                    size: 14,
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      category,
+                      style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.black),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.black,
+                      size: 14,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -200,10 +215,10 @@ class _VehicleCategoryState extends State<VehicleCategory> {
                         DateBottomSheet(vehicle: vehicles[index]),
                         VehiclePrefernceBottomsheet(),
                         ReservationBottomSheet(vehicle: vehicles[index]),
-                        TempratureBottomSheet(),
-                        PlayBottomSheet(),
-                        BagBottomSheet(),
-                        DrinkBottomsheet()
+                        const TempratureBottomSheet(),
+                        const PlayBottomSheet(),
+                        const BagBottomSheet(),
+                        const DrinkBottomsheet()
                       ];
 
                       showModalBottomSheet(
@@ -216,76 +231,15 @@ class _VehicleCategoryState extends State<VehicleCategory> {
                           ),
                         ),
                         builder: (BuildContext context) {
-                          // return TempratureBottomSheet();
                           return Obx(() {
                             return bottomSheets[
                                 bottomSheetController.currentIndex];
                           });
                         },
-                      ).then((value) {
-                        // Handle any result when the bottom sheet is dismissed
-                        // if (value == 'forward') {
-                        //   if (currentIndex < bottomSheets.length - 1) {
-                        //     setState(() {
-                        //       currentIndex++;
-                        //     });
-                        //   }
-                        //   Future.delayed(Duration(milliseconds: 100), () {
-                        //     showModalBottomSheet(
-                        //       context: context,
-                        //       isScrollControlled: true,
-                        //       shape: const RoundedRectangleBorder(
-                        //         borderRadius: BorderRadius.only(
-                        //           topLeft: Radius.circular(16.0),
-                        //           topRight: Radius.circular(16.0),
-                        //         ),
-                        //       ),
-                        //       builder: (BuildContext context) {
-                        //         return bottomSheets[currentIndex];
-                        //       },
-                        //     );
-                        //   });
-                        // } else if (value == 'backward') {
-                        //   print(
-                        //       "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSsss 444444444444444444444 $value");
-                        //   if (currentIndex > 0) {
-                        //     setState(() {
-                        //       currentIndex--;
-                        //     });
-                        //   }
-                        //   Future.delayed(Duration(milliseconds: 100), () {
-                        //     showModalBottomSheet(
-                        //       context: context,
-                        //       isScrollControlled: true,
-                        //       shape: const RoundedRectangleBorder(
-                        //         borderRadius: BorderRadius.only(
-                        //           topLeft: Radius.circular(16.0),
-                        //           topRight: Radius.circular(16.0),
-                        //         ),
-                        //       ),
-                        //       builder: (BuildContext context) {
-                        //         return bottomSheets[currentIndex];
-                        //       },
-                        //     );
-                        //   });
-                        // }
-                      });
-                      // showAllBottomSheet("SC", context, vehicles[index])
-                      //     .then((value) {
-                      //   if (value != null) {
-                      //     showAllBottomSheet("PR", context, null).then((value) {
-                      //       showAllBottomSheet("RD", context, vehicles[index]);
-                      //     });
-                      //   }
-                      // });
-
-                      // Get.to(BookingDetail(
-                      //   vehicle: vehicles[index],
-                      // ));
+                      ).then((value) {});
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Align(
                           alignment: Alignment.centerRight,
@@ -310,16 +264,17 @@ class _VehicleCategoryState extends State<VehicleCategory> {
                         Text(
                           vehicles[index].vehicleModel!,
                           style: GoogleFonts.inter(
-                              letterSpacing: 0.6,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400),
+                              letterSpacing: 1.2,
+                              color: Colors.black,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w300),
                         ),
                         Text(
                           "Up to ${vehicles[index].vehicleCapacity} seats",
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
                               letterSpacing: 0.6,
-                              fontSize: 10,
+                              fontSize: 9,
                               fontWeight: FontWeight.w400),
                         ),
                       ],

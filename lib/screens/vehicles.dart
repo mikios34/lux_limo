@@ -1,27 +1,23 @@
-import 'package:beyride/api/vehicle/mutation.dart';
+import 'package:beyride/api/vehicle/query.dart';
 import 'package:beyride/model/vehicle_make/vehicle_make.dart';
-import 'package:beyride/util/loading_progress_indicator.dart';
 import 'package:beyride/screens/saved_vehicles.dart';
-import 'package:beyride/widget/date_bottomsheet.dart';
+import 'package:beyride/screens/search_vehicle.dart';
+import 'package:beyride/util/error_page.dart';
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'vehicle/widget/vehicle_card.dart';
 
 class Vehicles extends StatelessWidget {
-  // PlaceController placeController = Get.find();
-  final List<List<VehicleMake>> vehicles;
   final List<String> categories;
   final String currentCat;
-  final Future<QueryResult<Object?>?> Function()? refetch;
-  Vehicles({
+  const Vehicles({
     super.key,
-    required this.vehicles,
     required this.categories,
     required this.currentCat,
-    required this.refetch,
   });
   @override
   Widget build(BuildContext context) {
@@ -34,14 +30,6 @@ class Vehicles extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           toolbarHeight: 70,
-          // title: Text(
-          //   "Select Vehicle",
-          //   style: GoogleFonts.inter(
-          //     fontWeight: FontWeight.w500,
-          //     fontSize: 20,
-          //     color: Colors.black,
-          //   ),
-          // ),
           leading: IconButton(
             onPressed: () {
               Get.back();
@@ -50,47 +38,45 @@ class Vehicles extends StatelessWidget {
             color: Colors.black,
           ),
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.search)),
             IconButton(
                 onPressed: () {
-                  Get.to(() => SavedVehicles(
-                        catvehicles: vehicles,
-                      ));
+                  Get.to(() => const SearchVehicle());
                 },
-                icon: Icon(Icons.favorite_outline))
+                icon: const Icon(
+                  FeatherIcons.search,
+                  size: 18,
+                )),
+            IconButton(
+                onPressed: () {
+                  Get.to(() => const SavedVehicles());
+                },
+                icon: const Icon(
+                  FeatherIcons.heart,
+                  size: 18,
+                ))
           ],
           bottom: PreferredSize(
-            preferredSize: Size.fromHeight(60),
+            preferredSize: const Size.fromHeight(60),
             child: SizedBox(
               width: double.infinity,
               child: TabBar(
                   isScrollable: true,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   labelColor: Colors.black,
-                  labelPadding: EdgeInsets.only(right: 15),
-                  indicatorPadding: EdgeInsets.only(right: 30),
+                  labelPadding: const EdgeInsets.only(right: 15),
+                  indicatorPadding: const EdgeInsets.only(right: 30),
                   indicator: UnderlineTabIndicator(
                     borderRadius: BorderRadius.circular(3),
-                    borderSide: BorderSide(
-                        width: 2,
-                        color: Colors
-                            .black), // Customize the indicator color and width
-                    // insets: EdgeInsets.only(
-                    //     left: 10,
-                    //     right: 10,
-                    //     bottom: 0), // Adjust the insets for width and alignment
+                    borderSide: const BorderSide(width: 2, color: Colors.black),
                   ),
-                  // indicator: UnderlineTabIndicator(
-                  //     borderRadius: BorderRadius.circular(3),
-                  //     borderSide: BorderSide(width: 4, color: Colors.black)),
                   labelStyle: GoogleFonts.inter(
-                    fontSize: 15,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
                     letterSpacing: 0.6,
                   ),
                   unselectedLabelStyle: GoogleFonts.inter(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w300,
                     color: Colors.black,
                     letterSpacing: 0.6,
@@ -103,273 +89,78 @@ class Vehicles extends StatelessWidget {
             ),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: TabBarView(
-              children: List.generate(
-            vehicles.length,
-            (index) => ListView.builder(
-              shrinkWrap: true,
-              itemBuilder: (context, newind) {
-                return _buildVehicleCard(vehicles[index][newind], context);
-              },
-              itemCount: vehicles[index].length,
-            ),
-          )
+        body: Query(
+            options: QueryOptions(
+                document: gql(getVehicleList),
+                variables: {"user_id": GetStorage().read('uid')}),
+            builder: (result, {fetchMore, refetch}) {
+              if (result.isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.black,
+                  ),
+                );
+              }
 
-              // [
-              //   ListView.builder(
-              //     shrinkWrap: true,
-              //     itemBuilder: (context, index) {
-              //       return _buildVehicleCard(vehicles[index], context);
-              //     },
-              //     itemCount: vehicles.length,
-              //   ),
-              // ],
-              ),
-        ),
+              if (result.hasException) {
+                             return ErrorPage(refetch: refetch);
+
+              }
+              final fromvehicles = (result.data!['getVehicleList'] as List)
+                  .map((e) => VehicleMake.fromJson(e))
+                  .toList();
+
+              final hightlyRatedV = fromvehicles
+                  .where((element) => element.isHighlyRated == true)
+                  .toList();
+              final modified = hightlyRatedV
+                  .map((e) => e.copyWith(vehicleMake: "Highly Rated"))
+                  .toList();
+              // vehicles.addAll(modified);
+              final vehicles = [...modified, ...fromvehicles];
+
+              final List<List<VehicleMake>> v =
+                  categorizeVehicles(vehicles).values.toList();
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TabBarView(
+                    children: List.generate(
+                  v.length,
+                  (index) => ListView.builder(
+                    shrinkWrap: true,
+                    itemBuilder: (context, newind) {
+                      return VehicleCard(
+                        vehicle: v[index][newind],
+                        refetch: refetch,
+                      );
+                    },
+                    itemCount: v[index].length,
+                  ),
+                )),
+              );
+            }),
       ),
     );
   }
 
-  _buildVehicleCard(VehicleMake vehicle, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 25),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              color: Theme.of(context).primaryColorDark,
+  Map<String, List<VehicleMake>> categorizeVehicles(
+      List<VehicleMake> vehicles) {
+    Map<String, List<VehicleMake>> categorizedVehicles = {};
 
-              ///const Color.fromRGBO(50, 45, 64, 1),
-            ),
-            width: double.infinity,
-            child: MaterialButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.white,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16.0),
-                      topRight: Radius.circular(16.0),
-                    ),
-                  ),
-                  builder: (context) {
-                    return DateBottomSheet(
-                      vehicle: vehicle,
-                    );
-                  },
-                );
-                // Get.to(BookingDetail(
-                //   vehicle: vehicle,
-                // ));
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                child: Column(
-                  children: [
-                    Image(
-                        height: 120, image: NetworkImage(vehicle.vehicleLogo!)),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              vehicle.vehicleModel!,
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Colors.black,
-                                letterSpacing: 0.6,
-                              ),
-                            ),
-                            Text(
-                              "Up to ${vehicle.vehicleCapacity!} Seats",
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 10,
-                                color: Colors.black45,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          "\$232",
-                          //( vehicle.price *
-                          //       placeController.direction.distanceValue *
-                          //       0.000621371)
-                          //   .toStringAsFixed(2),
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-              right: 0,
-              child: Mutation(
-                  options: MutationOptions(
-                      onCompleted: (data) {
-                        print("Dataaaaaaaaaaaaaaaaa $data");
-                        Navigator.pop(context);
-                        if (data != null) {
-                          refetch!();
-                        }
-                      },
-                      onError: (error) {
-                        Fluttertoast.showToast(msg: "Please try again!");
-                      },
-                      document: gql(saveReservationVehicleMutation)),
-                  builder: (runMutation, result) {
-                    return IconButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => LoadinProgressIndicator(),
-                          );
-                          runMutation({
-                            "userId": GetStorage().read('uid'),
-                            "vehicleId": vehicle.vehicleMakeId
-                          });
-                        },
-                        icon: vehicle.isSaved!
-                            ? Icon(Icons.favorite)
-                            : Icon(Icons.favorite_outline));
-                  }))
-        ],
-      ),
-    );
+    // Iterate through the vehicles
+    for (var vehicle in vehicles) {
+      String category = vehicle.vehicleMake!;
+
+      // Check if the category already exists in the map
+      if (categorizedVehicles.containsKey(category)) {
+        // If the category exists, add the vehicle to the existing category
+        categorizedVehicles[category]!.add(vehicle);
+      } else {
+        // If the category does not exist, create a new category and add the vehicle to it
+        categorizedVehicles[category] = [vehicle];
+      }
+    }
+
+    return categorizedVehicles;
   }
 }
-
-// final shimmerGradient = LinearGradient(
-//   colors: [
-//     const Color(0xFFEBEBF4),
-//     const Color(0xFFF4F4F4),
-//     Colors.grey.shade200
-//   ],
-//   stops: const [
-//     0.1,
-//     0.3,
-//     0.4,
-//   ],
-//   begin: const Alignment(-1.0, -0.3),
-//   end: const Alignment(1.0, 0.3),
-//   tileMode: TileMode.clamp,
-// );
-
-// const googleMapApiKey = 'AIzaSyBFKZsbNXUziq9csKo43sluvfjAxwtBbx8';
-
-//   if (result.isLoading) {
-//                       return Center(
-//                         child: ListView.builder(
-//                           itemBuilder: (context, index) {
-//                             return Padding(
-//                                 padding: const EdgeInsets.only(top: 25),
-//                                 child: Container(
-//                                   decoration: BoxDecoration(
-//                                     border: Border.all(
-//                                         color: Colors.grey, width: 0.2),
-//                                     borderRadius: BorderRadius.circular(6),
-//                                     // color: const Color.fromRGBO(50, 45, 64, 1),
-//                                   ),
-//                                   width: double.infinity,
-//                                   child: Padding(
-//                                     padding: const EdgeInsets.symmetric(
-//                                         vertical: 20, horizontal: 10),
-//                                     child: Column(
-//                                       children: [
-//                                         Shimmer(
-//                                           gradient: shimmerGradient,
-//                                           child: Container(
-//                                             height: 90,
-//                                             width: double.infinity,
-//                                             decoration: BoxDecoration(
-//                                               borderRadius:
-//                                                   BorderRadius.circular(10),
-//                                               color: Colors.grey.shade200,
-//                                             ),
-//                                           ),
-//                                         ),
-//                                         SizedBox(
-//                                           height: 10,
-//                                         ),
-//                                         Row(
-//                                           mainAxisAlignment:
-//                                               MainAxisAlignment.spaceBetween,
-//                                           children: [
-//                                             Column(
-//                                               crossAxisAlignment:
-//                                                   CrossAxisAlignment.start,
-//                                               children: [
-//                                                 Shimmer(
-//                                                   gradient: shimmerGradient,
-//                                                   child: Container(
-//                                                     height: 10,
-//                                                     width: 180,
-//                                                     decoration: BoxDecoration(
-//                                                       borderRadius:
-//                                                           BorderRadius.circular(
-//                                                               10),
-//                                                       color:
-//                                                           Colors.grey.shade200,
-//                                                     ),
-//                                                   ),
-//                                                 ),
-//                                                 SizedBox(
-//                                                   height: 15,
-//                                                 ),
-//                                                 Shimmer(
-//                                                   gradient: shimmerGradient,
-//                                                   child: Container(
-//                                                     height: 10,
-//                                                     width: 120,
-//                                                     decoration: BoxDecoration(
-//                                                       borderRadius:
-//                                                           BorderRadius.circular(
-//                                                               10),
-//                                                       color:
-//                                                           Colors.grey.shade200,
-//                                                     ),
-//                                                   ),
-//                                                 )
-//                                               ],
-//                                             ),
-//                                             Shimmer(
-//                                               gradient: shimmerGradient,
-//                                               child: Container(
-//                                                 height: 10,
-//                                                 width: 60,
-//                                                 decoration: BoxDecoration(
-//                                                   borderRadius:
-//                                                       BorderRadius.circular(10),
-//                                                   color: Colors.grey.shade200,
-//                                                 ),
-//                                               ),
-//                                             )
-//                                           ],
-//                                         )
-//                                       ],
-//                                     ),
-//                                   ),
-//                                 ));
-//                           },
-//                         ),
-//                       );
-//                     }

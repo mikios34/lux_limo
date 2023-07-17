@@ -28,8 +28,8 @@ class ReservationTrackerPage extends StatelessWidget {
               top: kToolbarHeight,
               right: 16.0,
               child: Container(
-                width: 44.0,
-                height: 44.0,
+                width: 50.0,
+                height: 50.0,
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.2),
                   shape: BoxShape.circle,
@@ -42,7 +42,7 @@ class ReservationTrackerPage extends StatelessWidget {
                     onTap: () {
                       Get.back();
                     },
-                    child: Icon(Icons.clear),
+                    child: const Icon(Icons.clear),
                   ),
                 ),
               )),
@@ -50,7 +50,7 @@ class ReservationTrackerPage extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: Container(
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(16),
@@ -58,7 +58,7 @@ class ReservationTrackerPage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   Container(
@@ -68,11 +68,11 @@ class ReservationTrackerPage extends StatelessWidget {
                         color: Theme.of(context).primaryColorDark,
                         borderRadius: BorderRadius.circular(3)),
                   ),
-                  SizedBox(
-                    height: 40,
+                  const SizedBox(
+                    height: 20,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -84,19 +84,19 @@ class ReservationTrackerPage extends StatelessWidget {
                               getDatefromDateTime(reservation.date!),
                               style: GoogleFonts.inter(
                                   color: Colors.black,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   letterSpacing: 0.6,
                                   fontWeight: FontWeight.w500),
                             ),
-                            SizedBox(
-                              height: 8,
+                            const SizedBox(
+                              height: 10,
                             ),
                             Text(
                               getTimefromDateTime(reservation.date!),
                               style: GoogleFonts.inter(
                                   color: Colors.black,
-                                  fontSize: 16,
-                                  letterSpacing: 0.6,
+                                  fontSize: 14,
+                                  letterSpacing: 0.26,
                                   fontWeight: FontWeight.w500),
                             ),
                           ],
@@ -106,7 +106,7 @@ class ReservationTrackerPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   // Container(
@@ -128,27 +128,26 @@ class ReservationTrackerPage extends StatelessWidget {
                   Query(
                       options: QueryOptions(
                           fetchPolicy: FetchPolicy.cacheAndNetwork,
-                          pollInterval: Duration(seconds: 5),
+                          pollInterval: const Duration(seconds: 5),
                           document: gql(getReservationByIdQuery),
                           variables: {
                             "userId": GetStorage().read('uid'),
                             "reservationId": reservation.reservationId
                           }),
                       builder: (result, {fetchMore, refetch}) {
-                        final status =
-                            result.data!['getReservationById']['status'];
-
-                        if (status == "Complete") {
-                          WidgetsBinding.instance
-                              .addPostFrameCallback((timeStamp) {
-                            Get.off(() => ReviewPage(
-                                reservationId: reservation.reservationId!));
-                          });
-                        }
-                        if (result.isNotLoading && !result.hasException) {
+                        if (result.data != null) {
+                          final status =
+                              result.data!['getReservationById']['status'];
+                          if (status == "Complete") {
+                            WidgetsBinding.instance
+                                .addPostFrameCallback((timeStamp) {
+                              Get.off(() => ReviewPage(
+                                  reservationId: reservation.reservationId!));
+                            });
+                          }
                           return Container(
                             padding: const EdgeInsets.symmetric(
-                                vertical: 20, horizontal: 25),
+                                vertical: 25, horizontal: 25),
                             decoration: BoxDecoration(
                               color: Theme.of(context).primaryColorDark,
                             ),
@@ -167,8 +166,8 @@ class ReservationTrackerPage extends StatelessWidget {
                           );
                         }
                         return Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 25),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 25, horizontal: 25),
                           decoration: BoxDecoration(
                             color: Theme.of(context).primaryColorDark,
                           ),
@@ -186,7 +185,7 @@ class ReservationTrackerPage extends StatelessWidget {
                           ),
                         );
                       }),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Padding(
@@ -195,9 +194,9 @@ class ReservationTrackerPage extends StatelessWidget {
                         onPressed: () {
                           Get.to(ReservationDetail(reserevation: reservation));
                         },
-                        child: Text("View Trip Detail")),
+                        child: const Text("View Trip Detail")),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 25,
                   ),
                 ],

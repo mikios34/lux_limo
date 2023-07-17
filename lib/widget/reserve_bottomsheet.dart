@@ -53,7 +53,7 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
         if (showAlert)
           Container(
             // height: 150,
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             child: Stack(
               children: [
                 Column(
@@ -71,33 +71,36 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
                     // SizedBox(
                     //   height: 15,
                     // ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     Text(
                       "Subtotal :   \$400",
                       style: GoogleFonts.inter(
                         color: Colors.black,
-                        fontSize: 12,
+                        fontSize: 11,
                         letterSpacing: 0.8,
                         fontWeight: FontWeight.w300,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     Text(
                       "Tax :           \$20",
                       style: GoogleFonts.inter(
                         color: Colors.black,
-                        fontSize: 12,
+                        fontSize: 11,
                         letterSpacing: 0.8,
                         fontWeight: FontWeight.w300,
                       ),
                     ),
-                    Divider(),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 50),
+                      child: Divider(),
+                    ),
                     Text(
-                      "Total :         \$420",
+                      "Total :       \$420",
                       style: GoogleFonts.inter(
                         color: Colors.black,
                         fontSize: 12,
@@ -110,8 +113,8 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
                 Align(
                   alignment: Alignment.topRight,
                   child: Container(
-                    width: 30.0,
-                    height: 30.0,
+                    width: 25.0,
+                    height: 25.0,
                     // margin: EdgeInsets.only(right: 25),
                     decoration: BoxDecoration(
                       // color: Color.fromRGBO(189, 248, 154, 1),
@@ -129,7 +132,7 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
                           child: const Icon(
                             Icons.clear,
                             color: Colors.black,
-                            size: 18,
+                            size: 13,
                           )),
                     ),
                   ),
@@ -138,7 +141,7 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
             ),
           ),
         Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16.0),
@@ -151,15 +154,23 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                leading: IconButton(
-                    onPressed: () {
-                      bottomSheetController.currentIndex = 1;
-                    },
-                    icon: Icon(
-                      Icons.arrow_back_sharp,
-                      color: Colors.black,
-                      size: 30,
-                    )),
+                minLeadingWidth: 40,
+                leading: Column(
+                  children: [
+                    InkWell(
+                        onTap: () {
+                          bottomSheetController.currentIndex = 1;
+                        },
+                        child: const Icon(
+                          Icons.arrow_back_sharp,
+                          color: Colors.black,
+                          size: 30,
+                        )),
+                    // SizedBox(
+                    //   height: ,
+                    // )
+                  ],
+                ),
                 title: RichText(
                     text: TextSpan(
                         text: "\$",
@@ -205,10 +216,10 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
                               fontWeight: FontWeight.w300,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 5,
                           ),
-                          Icon(
+                          const Icon(
                             Icons.help_outline,
                             size: 12,
                           )
@@ -224,7 +235,7 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
               const SizedBox(
                 height: 05,
               ),
-              Divider(),
+              const Divider(),
               const SizedBox(
                 height: 20,
               ),
@@ -292,12 +303,17 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
                               letterSpacing: 1.2,
                               fontWeight: FontWeight.w400),
                         ),
+                        const Spacer(),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                        )
                       ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               Padding(
@@ -330,7 +346,7 @@ class _ReservationBottomSheetState extends State<ReservationBottomSheet> {
                               showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return const LoadinProgressIndicator();
+                                  return LinearLoadingProgressIndicator();
                                 },
                               );
                               data['pickup'] =

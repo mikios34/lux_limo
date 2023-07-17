@@ -33,17 +33,17 @@ class LinearLoadingProgressIndicator extends StatelessWidget {
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Column(
-          children: [
+          children: const [
             Dialog(
                 elevation: 0,
-                insetPadding: const EdgeInsets.all(0),
+                insetPadding: EdgeInsets.all(0),
                 backgroundColor: Colors.transparent,
                 child: SizedBox(
                   height: 2,
                   child: LinearProgressIndicator(
                     // minHeight: 5,
                     color: Colors.white,
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: Colors.black,
                   ),
                 )),
           ],

@@ -25,7 +25,7 @@ ThemeData myTheme() {
                       ? Colors.black
                       : Colors.white),
               textStyle: MaterialStateProperty.all(GoogleFonts.inter(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                   letterSpacing: 1.2)))),
@@ -42,7 +42,7 @@ ThemeData myTheme() {
               foregroundColor:
                   MaterialStateProperty.resolveWith<Color>((Set<MaterialState> state) => state.contains(MaterialState.disabled) ? Colors.black : Colors.black),
               textStyle: MaterialStateProperty.all(GoogleFonts.inter(
-                fontSize: 15,
+                fontSize: 14,
                 letterSpacing: 0.6,
                 fontWeight: FontWeight.w500,
                 color: Colors.white,
@@ -104,7 +104,7 @@ ThemeData myTheme() {
           titleTextStyle: GoogleFonts.inter(
             color: Colors.black,
             fontSize: 23,
-            letterSpacing: 0.6,
+            letterSpacing: 1.4,
             fontWeight: FontWeight.w300,
           )));
 }

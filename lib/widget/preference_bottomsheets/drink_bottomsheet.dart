@@ -103,16 +103,13 @@ class _DrinkBottomsheetState extends State<DrinkBottomsheet> {
                 "Drink",
                 style: GoogleFonts.inter(
                   letterSpacing: 0.6,
-                  fontSize: 25,
+                  fontSize: 23,
                   fontWeight: FontWeight.w300,
                 ),
               ),
+
               const SizedBox(
-                height: 10,
-              ),
-              Divider(),
-              const SizedBox(
-                height: 20,
+                height: 70,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -130,15 +127,15 @@ class _DrinkBottomsheetState extends State<DrinkBottomsheet> {
                       itemCount: data.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: 1.0,
+                        childAspectRatio: 0.8,
                         crossAxisCount: 3,
                       ),
                       itemBuilder: (context, index) => Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            height: 55,
-                            width: 55,
+                            height: 65,
+                            width: 65,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,

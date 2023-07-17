@@ -30,8 +30,8 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
       children: [
         if (showAlert)
           Container(
-            height: 50,
-            padding: EdgeInsets.symmetric(vertical: 10),
+            height: 63,
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: Stack(
               children: [
                 // SizedBox.shrink(),
@@ -41,8 +41,8 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
                     child: Text(
                       "Select Date",
                       style: GoogleFonts.inter(
-                          letterSpacing: 0.6,
-                          fontSize: 16,
+                          letterSpacing: 1.4,
+                          fontSize: 14,
                           fontWeight: FontWeight.w300),
                     )),
                 Align(
@@ -50,7 +50,7 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
                   child: Container(
                     width: 30.0,
                     height: 30.0,
-                    margin: EdgeInsets.only(right: 25),
+                    margin: const EdgeInsets.only(right: 25),
                     decoration: BoxDecoration(
                       // color: Color.fromRGBO(189, 248, 154, 1),
                       border: Border.all(color: Colors.black, width: 0.1),
@@ -76,14 +76,14 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
             ),
           ),
         Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16.0),
               topRight: Radius.circular(16.0),
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -158,7 +158,8 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
                                   child: child!,
                                 );
                               },
-                              initialDate: DateTime.now(),
+                              initialDate:
+                                  homePageController.date ?? DateTime.now(),
                               firstDate: DateTime(2020),
                               lastDate: DateTime(2030));
                           if (pickedDate != null) {
@@ -166,7 +167,8 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
                             if (homePageController.time == null) {
                               final pickedTime = await showTimePicker(
                                 context: context,
-                                initialTime: TimeOfDay.now(),
+                                initialTime:
+                                    homePageController.time ?? TimeOfDay.now(),
                                 builder: (context, child) {
                                   return Theme(
                                     data: ThemeData.light().copyWith(
@@ -240,7 +242,8 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
                         onPressed: () async {
                           final pickedTime = await showTimePicker(
                             context: context,
-                            initialTime: TimeOfDay.now(),
+                            initialTime:
+                                homePageController.time ?? TimeOfDay.now(),
                             builder: (context, child) {
                               return Theme(
                                 data: ThemeData.light().copyWith(
@@ -277,7 +280,7 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
                               Icons.lock_clock,
                               color: Colors.black,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 20,
                             ),
                             Obx(() {
@@ -300,7 +303,7 @@ class _DateBottomSheetState extends State<DateBottomSheet> {
                   )
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 40,
               ),
               ElevatedButton(

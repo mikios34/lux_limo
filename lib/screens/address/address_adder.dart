@@ -62,7 +62,7 @@ class AddressAdderPage extends StatelessWidget {
                   onTap: () async {
                     showDialog(
                         context: context,
-                        builder: (context) => const LoadinProgressIndicator());
+                        builder: (context) => LinearLoadingProgressIndicator());
                     final place = await placeController.getPlaceDetailByPlaceId(
                         placeController.places[index].placeId);
 

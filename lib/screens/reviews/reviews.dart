@@ -79,226 +79,221 @@ class _ReviewPageState extends State<ReviewPage> {
               SizedBox(
                 height: height * 5,
               ),
-              Query(
-                options: QueryOptions(
-                    document: gql(checkIfReservationUserHasReviewedQuery),
-                    variables: {
-                      "userId": GetStorage().read("uid"),
-                      "reservation_id": widget.reservationId,
-                    }),
-                builder: (result, {fetchMore, refetch}) {
-                  if (result.isLoading) {
-                    return Container();
-                  }
-                  if (result.hasException) {
-                    // return ErrorPage(refetch: refetch);
-                  }
+              // Query(
+              //   options: QueryOptions(
+              //       document: gql(checkIfReservationUserHasReviewedQuery),
+              //       variables: {
+              //         "userId": GetStorage().read("uid"),
+              //         "reservation_id": widget.reservationId,
+              //       }),
+              //   builder: (result, {fetchMore, refetch}) {
+              //     if (result.isLoading) {
+              //       return Container();
+              //     }
+              //     if (result.hasException) {
+              //       // return ErrorPage(refetch: refetch);
+              //     }
 
-                  final isRated = result.data!['checkIfUserReviewedProduct'];
+              //     final isRated = result.data!['checkIfUserReviewedProduct'];
 
-                  if (!isRated) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+              //     if (!isRated) {
+              //       return
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    data['rate'].toString(),
+                    style: GoogleFonts.inter(
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 25,
+                        color: Colors.black),
+                  ),
+                  SizedBox(
+                    height: height * 1,
+                  ),
+
+                  RatingBar.builder(
+                      itemSize: 25,
+                      initialRating: 5,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      unratedColor: Theme.of(context)
+                          .primaryColorDark, //Color.fromRGBO(197, 201, 33, 1),
+                      //itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                      itemBuilder: (context, _) =>
+                          const Icon(Icons.star, color: Colors.black),
+                      onRatingUpdate: (rating) {
+                        data['rate'] = rating;
+                        setState(() {});
+                      }),
+                  SizedBox(
+                    height: height * 5,
+                  ),
+                  Text(
+                    "Review".tr,
+                    style: GoogleFonts.inter(
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18,
+                        letterSpacing: 0.8,
+                        color: Colors.black),
+                  ),
+                  SizedBox(
+                    height: height * 1,
+                  ),
+                  Text(
+                    "How was your trip?".tr,
+                    style: GoogleFonts.inter(
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        letterSpacing: 0.8,
+                        color: Colors.grey.shade600),
+                  ),
+                  SizedBox(
+                    height: height * 2,
+                  ),
+                  // const VerticalDivider(),
+
+                  SizedBox(
+                    height: height * 2,
+                  ),
+                  Form(
+                    key: _fromKey,
+                    child: Column(
                       children: [
-                        Text(
-                          data['rate'].toString(),
-                          style: GoogleFonts.inter(
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 25,
-                              color: Colors.black),
-                        ),
                         SizedBox(
-                          height: height * 1,
+                          height: height * 2,
                         ),
-
-                        RatingBar.builder(
-                            itemSize: 25,
-                            initialRating: 5,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 5,
-                            unratedColor: Theme.of(context)
-                                .primaryColorDark, //Color.fromRGBO(197, 201, 33, 1),
-                            //itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                            itemBuilder: (context, _) =>
-                                const Icon(Icons.star, color: Colors.black),
-                            onRatingUpdate: (rating) {
-                              data['rate'] = rating;
-                              setState(() {});
-                            }),
-                        SizedBox(
-                          height: height * 5,
-                        ),
-                        Text(
-                          "Review".tr,
+                        TextFormField(
+                          keyboardType: TextInputType.multiline,
+                          minLines: 4,
+                          maxLines: 5,
                           style: GoogleFonts.inter(
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18,
-                              letterSpacing: 0.8,
-                              color: Colors.black),
-                        ),
-                        SizedBox(
-                          height: height * 1,
-                        ),
-                        Text(
-                          "How was your trip?".tr,
-                          style: GoogleFonts.inter(
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w400,
                               fontSize: 14,
+                              fontWeight: FontWeight.w300,
+                              fontStyle: FontStyle.normal,
                               letterSpacing: 0.8,
-                              color: Colors.grey.shade600),
-                        ),
-                        SizedBox(
-                          height: height * 2,
-                        ),
-                        // const VerticalDivider(),
-
-                        SizedBox(
-                          height: height * 2,
-                        ),
-                        Form(
-                          key: _fromKey,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: height * 2,
-                              ),
-                              TextFormField(
-                                keyboardType: TextInputType.multiline,
-                                minLines: 4,
-                                maxLines: 5,
-                                style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w300,
-                                    fontStyle: FontStyle.normal,
-                                    letterSpacing: 0.8,
-                                    color: Colors.black),
-                                decoration: InputDecoration(
-                                  alignLabelWithHint: true,
-                                  enabledBorder: InputBorder.none,
-                                  filled: true,
-                                  hintText: "Leave us a review".tr,
-                                  hintStyle: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w300,
-                                      fontStyle: FontStyle.normal,
-                                      letterSpacing: 0.8,
-                                      color: Colors.black),
-                                ),
-                                onSaved: (newValue) {
-                                  data['comment'] = newValue;
-                                },
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Leave us a review".tr;
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ],
+                              color: Colors.black),
+                          decoration: InputDecoration(
+                            alignLabelWithHint: true,
+                            enabledBorder: InputBorder.none,
+                            filled: true,
+                            hintText: "Leave us a review".tr,
+                            hintStyle: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                fontStyle: FontStyle.normal,
+                                letterSpacing: 0.8,
+                                color: Colors.black),
                           ),
+                          onSaved: (newValue) {
+                            data['comment'] = newValue;
+                          },
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Leave us a review".tr;
+                            }
+                            return null;
+                          },
                         ),
-
-                        SizedBox(
-                          height: height * 3,
-                        ),
-
-                        SizedBox(
-                            height: 45,
-                            width: double.infinity,
-                            child: Mutation(
-                                options: MutationOptions(
-                                  document:
-                                      gql(addReservationUserReviewMutation),
-                                  onCompleted: (data) {
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                    if (data != null) {
-                                      Get.until((route) {
-                                        if (route.settings.name ==
-                                            "/HomePage") {
-                                          return true;
-                                        } else {
-                                          return false;
-                                        }
-                                      });
-                                    }
-                                    // debugPrint(data.toString());
-                                  },
-                                  onError: (error) {
-                                    print("Errrrrorrrrrrr is $error");
-                                    Fluttertoast.showToast(
-                                        msg: "Please try again");
-                                  },
-                                ),
-                                builder: (runMutation, result) {
-                                  return ElevatedButton(
-                                      onPressed: !_isLoading
-                                          ? () {
-                                              final form =
-                                                  _fromKey.currentState;
-                                              if (form!.validate()) {
-                                                form.save();
-                                                setState(() {
-                                                  _isLoading = true;
-                                                });
-
-                                                runMutation({
-                                                  "userId":
-                                                      GetStorage().read("uid"),
-                                                  "reviewInput": {
-                                                    // "reservation_id":
-                                                    //     widget.reservationId,
-                                                    "comment": data['comment'],
-                                                    "rating": data['rate'],
-                                                  }
-                                                });
-                                              }
-                                            }
-                                          : null,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          if (_isLoading) const Spacer(),
-                                          Text(
-                                            "Submit Review".tr,
-                                          ),
-                                          if (_isLoading) ...[
-                                            const Spacer(),
-                                            const SizedBox(
-                                              height: 20,
-                                              width: 20,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.black,
-                                                strokeWidth: 1,
-                                              ),
-                                            )
-                                          ]
-                                        ],
-                                      ));
-                                })),
                       ],
-                    );
-                  } else {
-                    return Center(
-                      child: Text(
-                        "Reservation rated".tr,
-                        style: GoogleFonts.inter(
-                            fontStyle: FontStyle.normal,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                            color: Colors.grey.shade600),
-                      ),
-                    );
-                  }
-                },
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: height * 3,
+                  ),
+
+                  SizedBox(
+                      height: 45,
+                      width: double.infinity,
+                      child: Mutation(
+                          options: MutationOptions(
+                            document: gql(addReservationUserReviewMutation),
+                            onCompleted: (data) {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                              if (data != null) {
+                                Get.until((route) {
+                                  if (route.settings.name == "/HomePage") {
+                                    return true;
+                                  } else {
+                                    return false;
+                                  }
+                                });
+                              }
+                            },
+                            onError: (error) {
+                              Fluttertoast.showToast(msg: "Please try again");
+                            },
+                          ),
+                          builder: (runMutation, result) {
+                            return ElevatedButton(
+                                onPressed: !_isLoading
+                                    ? () {
+                                        final form = _fromKey.currentState;
+                                        if (form!.validate()) {
+                                          form.save();
+                                          setState(() {
+                                            _isLoading = true;
+                                          });
+
+                                          runMutation({
+                                            "userId": GetStorage().read("uid"),
+                                            "reservationId":
+                                                widget.reservationId,
+                                            "reviewInput": {
+                                              "comment": data['comment'],
+                                              "rating": data['rate'],
+                                            }
+                                          });
+                                        }
+                                      }
+                                    : null,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (_isLoading) const Spacer(),
+                                    Text(
+                                      "Submit Review".tr,
+                                    ),
+                                    if (_isLoading) ...[
+                                      const Spacer(),
+                                      const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.black,
+                                          strokeWidth: 1,
+                                        ),
+                                      )
+                                    ]
+                                  ],
+                                ));
+                          })),
+                ],
               ),
+              //       ;
+              //     } else {
+              //       return Center(
+              //         child: Text(
+              //           "Reservation rated".tr,
+              //           style: GoogleFonts.inter(
+              //               fontStyle: FontStyle.normal,
+              //               fontWeight: FontWeight.w400,
+              //               fontSize: 14,
+              //               color: Colors.grey.shade600),
+              //         ),
+              //       );
+              //     }
+              //   },
+              // ),
               SizedBox(
                 height: height * 3,
               ),

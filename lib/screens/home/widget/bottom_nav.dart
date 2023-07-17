@@ -1,11 +1,12 @@
+import 'package:beyride/api/notification/query.dart';
 import 'package:beyride/screens/home/home_controller.dart';
+import 'package:beyride/screens/notification/notification.dart';
 import 'package:beyride/screens/reservation/reservation.dart';
 import 'package:beyride/screens/settings/settings.dart';
-import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class BottomNav extends StatelessWidget {
   BottomNav({super.key});
@@ -16,6 +17,7 @@ class BottomNav extends StatelessWidget {
     return Container(
       // padding: EdgeInsets.symmetric(vertical: 15),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Divider(),
           const SizedBox(
@@ -34,11 +36,41 @@ class BottomNav extends StatelessWidget {
               ),
               // const Icon(Icons.location_pin),
 
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_outlined),
-                color: Colors.black,
-              ),
+              Query(
+                  options: QueryOptions(
+                      document:
+                          gql(reservationUserUnSeenNotificationCountQuery),
+                      variables: {"userId": GetStorage().read('uid')}),
+                  builder: (result, {fetchMore, refetch}) {
+                    return Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Get.to(() => NotificationPage(
+                                  refetch: refetch,
+                                ));
+                          },
+                          icon: const Icon(Icons.notifications_outlined),
+                          color: Colors.black,
+                        ),
+                        if (result.data != null)
+                          if (result.data![
+                                  'getReservationUserUnSeenNotificationCount'] !=
+                              0)
+                            Positioned(
+                              right: 7,
+                              top: 7,
+                              child: Container(
+                                height: 10,
+                                width: 10,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.black),
+                              ),
+                            )
+                      ],
+                    );
+                  }),
               // const Icon(Icons.notifications_outlined),
 
               IconButton(

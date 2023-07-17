@@ -2,6 +2,7 @@ import 'package:beyride/api/query.dart';
 import 'package:beyride/model/airport.dart';
 import 'package:beyride/model/place_detail.dart';
 import 'package:beyride/screens/home/home_controller.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,7 +42,7 @@ class AirPorts extends StatelessWidget {
                 }
                 if (result.hasException) {
                   refetch!();
-                  return Text("Error ${result.exception}");
+                  return ErrorPage(refetch: refetch);
                 }
                 final List<Airport> airports =
                     (result.data!['getReservationAirport'] as List)

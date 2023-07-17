@@ -1,6 +1,7 @@
 import 'package:beyride/api/address/query.dart';
 import 'package:beyride/model/address/address_model.dart';
 import 'package:beyride/screens/address/widget/address_item.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:beyride/widget/add_address_bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -56,7 +57,7 @@ class AddressesPage extends StatelessWidget {
                   this.refetch = refetch;
                   if (result.hasException == true) {
                     print("result ${result.exception}");
-                    return Text('Error fetching addresses');
+                    return ErrorPage(refetch: refetch);
                   }
 
                   if (result.isLoading == true) {

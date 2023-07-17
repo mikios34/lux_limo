@@ -16,7 +16,7 @@ class PlaceDataProvider {
     final _baseUrl =
         // "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$location&location=37.0902%2C95.7129&radius=500&types=(establishment|address)&key=$googleMapApiKey";
 
-    "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$location&location=37.0902%2C95.7129&radius=500&types=address&key=$googleMapApiKey";
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$location&location=37.0902%2C95.7129&radius=500&types=address&key=$googleMapApiKey";
 
     final response = await httpClient.get(Uri.parse(_baseUrl));
 
@@ -58,6 +58,39 @@ class PlaceDataProvider {
       return Direction.fromJson(data);
     } else {
       throw Exception('Failed to load loaction');
+    }
+  }
+
+  Future<num> fetchDistanceAndDuration(
+      LatLng origin, LatLng destination, LatLng? waypoint) async {
+    String originLatLng = '${origin.latitude},${origin.longitude}';
+    String destinationLatLng =
+        '${destination.latitude},${destination.longitude}';
+
+    String waypointsString = '';
+    if (waypoint != null) {
+      waypointsString = '&waypoints=${waypoint.latitude},${waypoint.longitude}';
+    }
+
+    // Uri uri = Uri.parse(
+    //     'https://maps.googleapis.com/maps/api/directions/json?origin=$originLatLng&destination=$destinationLatLng$waypointsString&key=$googleMapApiKey');
+
+    Uri uri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=$originLatLng&destinations=$destinationLatLng$waypointsString&key=$googleMapApiKey');
+
+    http.Response response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = json.decode(response.body);
+
+      List<dynamic> rows = data['rows'];
+      if (rows[0]['elements'][0]['status'] == 'OK') {
+        return rows[0]['elements'][0]['distance']['value'] / 1000;
+      } else {
+        return 0;
+      }
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}');
     }
   }
 }

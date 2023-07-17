@@ -71,7 +71,7 @@ class _BagBottomSheetState extends State<BagBottomSheet> {
               topRight: Radius.circular(16.0),
             ),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -93,18 +93,15 @@ class _BagBottomSheetState extends State<BagBottomSheet> {
                 "Bag",
                 style: GoogleFonts.inter(
                     letterSpacing: 0.6,
-                    fontSize: 25,
+                    fontSize: 23,
+                    color: Colors.black,
                     fontWeight: FontWeight.w300),
               ),
               const SizedBox(
-                height: 10,
-              ),
-              Divider(),
-              const SizedBox(
-                height: 20,
+                height: 50,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 66),
                 child: Query(
                     options: QueryOptions(
                         document: gql(getReservationPreferenceBagsOnlyQuery)),
@@ -116,7 +113,7 @@ class _BagBottomSheetState extends State<BagBottomSheet> {
                           itemCount: data.length,
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
-                                  childAspectRatio: 1.4,
+                                  childAspectRatio: 1.2,
                                   crossAxisCount: data.length == 1
                                       ? 1
                                       : data.length == 2
@@ -126,8 +123,8 @@ class _BagBottomSheetState extends State<BagBottomSheet> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    height: 55,
-                                    width: 55,
+                                    height: 65,
+                                    width: 65,
                                     decoration: BoxDecoration(
                                         color: Colors.white,
                                         shape: BoxShape.circle,
@@ -173,7 +170,7 @@ class _BagBottomSheetState extends State<BagBottomSheet> {
                     }),
               ),
               const SizedBox(
-                height: 40,
+                height: 30,
               ),
             ],
           ),

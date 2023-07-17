@@ -1,18 +1,17 @@
 import 'package:beyride/api/address/query.dart';
 import 'package:beyride/controller/place_controller.dart';
 import 'package:beyride/model/address/address_model.dart';
-import 'package:beyride/model/place.dart';
 import 'package:beyride/model/place_detail.dart';
-import 'package:beyride/screens/address/widget/address_item.dart';
 import 'package:beyride/screens/home/home_controller.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:beyride/util/loading_progress_indicator.dart';
 import 'package:beyride/screens/vehicle_category.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class LocationSearchResult extends StatelessWidget {
@@ -41,7 +40,7 @@ class LocationSearchResult extends StatelessWidget {
           builder: (result, {fetchMore, refetch}) {
             if (result.hasException == true) {
               print("result ${result.exception}");
-              return const Text('Error fetching addresses');
+              return ErrorPage(refetch: refetch);
             }
             // if (result.isLoading == true) {
             //   return const CircularProgressIndicator(
@@ -66,11 +65,13 @@ class LocationSearchResult extends StatelessWidget {
                 );
                 return ListTile(
                   onTap: () {
-                    _handleOnTap(PlaceDetail(
-                        placeName: address.address!,
-                        placeId: address.address!,
-                        lat: address.latitude!,
-                        lng: address.longitude!));
+                    _handleOnTap(
+                        PlaceDetail(
+                            placeName: address.address!,
+                            placeId: address.address!,
+                            lat: address.latitude!,
+                            lng: address.longitude!),
+                        context);
                   },
                   contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                   leading: Icon(
@@ -114,11 +115,11 @@ class LocationSearchResult extends StatelessWidget {
                 onTap: () async {
                   showDialog(
                       context: context,
-                      builder: (context) => const LoadinProgressIndicator());
+                      builder: (context) => LinearLoadingProgressIndicator());
                   final place = await placeController.getPlaceDetailByPlaceId(
                       placeController.places[index].placeId);
                   Navigator.pop(context);
-                  _handleOnTap(place);
+                  _handleOnTap(place, context);
 
                   // Navigator.pop(context);
                 },
@@ -159,54 +160,99 @@ class LocationSearchResult extends StatelessWidget {
     // );
   }
 
-  void _navigateToNextPage() {
-    Get.to(() => VehicleCategory());
+  void _navigateToNextPage(BuildContext context) async {
+    showDialog(
+        context: context,
+        builder: (context) => LinearLoadingProgressIndicator());
+    final distance = await placeController.fetchDistanceAndDuration(
+        LatLng(homePageController.pickup!.lat, homePageController.pickup!.lng),
+        LatLng(homePageController.destination!.lat,
+            homePageController.destination!.lng),
+        homePageController.stop != null
+            ? LatLng(homePageController.stop!.lat, homePageController.stop!.lng)
+            : null);
+    Navigator.pop(context);
+
+    if (distance == 0) {
+      Fluttertoast.showToast(msg: "No route could be found ");
+    } else if (distance < homePageController.minDistance) {
+      Fluttertoast.showToast(msg: "Distance is too short");
+    } else if (distance > homePageController.maxDistance) {
+      Fluttertoast.showToast(msg: "Distance is too long");
+    } else {
+      FocusManager.instance.primaryFocus!.unfocus();
+
+      homePageController.distance = distance;
+
+      Get.to(() => VehicleCategory());
+    }
   }
 
-  void _handleOnTap(PlaceDetail place) {
+  void _handleOnTap(PlaceDetail place, BuildContext context) async {
     Future.delayed(
       const Duration(milliseconds: 100),
       () {
         if (homePageController.pickupFocusNode.hasFocus) {
-          homePageController.pickup = place;
-          homePageController.pickupTextEditingController.text = place.placeName;
-          if (homePageController.showStopPicker &&
-              homePageController.stop == null) {
-            homePageController.stopFocusNode.requestFocus();
-          } else if (homePageController.destination == null) {
-            homePageController.destinationFocusNode.requestFocus();
+          if (place != homePageController.destination &&
+              place != homePageController.stop) {
+            homePageController.pickup = place;
+            homePageController.pickupTextEditingController.text =
+                place.placeName;
+            if (homePageController.showStopPicker &&
+                homePageController.stop == null) {
+              homePageController.stopFocusNode.requestFocus();
+            } else if (homePageController.destination == null) {
+              homePageController.destinationFocusNode.requestFocus();
+            } else {
+              // to next page
+              _navigateToNextPage(context);
+            }
           } else {
-            // to next page
-            _navigateToNextPage();
+            Fluttertoast.showToast(
+              msg: "Can't be the same address",
+            );
           }
         }
         if (homePageController.stopFocusNode.hasFocus) {
-          homePageController.stop = place;
-          homePageController.stopeTextEditingController.text = place.placeName;
-          if (homePageController.pickup == null) {
-            homePageController.pickupFocusNode.requestFocus();
-          } else if (homePageController.destination == null) {
-            homePageController.destinationFocusNode.requestFocus();
+          if (place != homePageController.destination &&
+              place != homePageController.pickup) {
+            homePageController.stop = place;
+            homePageController.stopeTextEditingController.text =
+                place.placeName;
+            if (homePageController.pickup == null) {
+              homePageController.pickupFocusNode.requestFocus();
+            } else if (homePageController.destination == null) {
+              homePageController.destinationFocusNode.requestFocus();
+            } else {
+              // to next page
+              _navigateToNextPage(context);
+            }
           } else {
-            // to next page
-            _navigateToNextPage();
+            Fluttertoast.showToast(
+              msg: "Can't be the same address",
+            );
           }
-          print("Stope selected");
         }
         if (homePageController.destinationFocusNode.hasFocus) {
-          homePageController.destination = place;
-          homePageController.destinationTextEditingController.text =
-              place.placeName;
-          if (homePageController.showStopPicker &&
-              homePageController.stop == null) {
-            homePageController.stopFocusNode.requestFocus();
-          } else if (homePageController.pickup == null) {
-            homePageController.pickupFocusNode.requestFocus();
+          if (place != homePageController.stop &&
+              place != homePageController.pickup) {
+            homePageController.destination = place;
+            homePageController.destinationTextEditingController.text =
+                place.placeName;
+            if (homePageController.showStopPicker &&
+                homePageController.stop == null) {
+              homePageController.stopFocusNode.requestFocus();
+            } else if (homePageController.pickup == null) {
+              homePageController.pickupFocusNode.requestFocus();
+            } else {
+              // to next page
+              _navigateToNextPage(context);
+            }
           } else {
-            // to next page
-            _navigateToNextPage();
+            Fluttertoast.showToast(
+              msg: "Can't be the same address",
+            );
           }
-          print("Destination selected");
         }
       },
     );

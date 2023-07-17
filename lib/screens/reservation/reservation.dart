@@ -1,6 +1,8 @@
 import 'package:beyride/api/reservation/query.dart';
 import 'package:beyride/model/reservation/reservation.dart';
 import 'package:beyride/screens/reservation/widget/reservation_item.dart';
+import 'package:beyride/util/empty_card.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,16 +16,16 @@ class ReservationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColorDark,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).primaryColorDark,
+        backgroundColor: Colors.white,
         title: const Text("Reservations"),
         leading: IconButton(
             onPressed: () {
               Get.back();
             },
-            icon: Icon(Icons.arrow_back_ios_new)),
+            icon: const Icon(Icons.arrow_back_ios_new)),
         actions: [
           IconButton(
               onPressed: () async {
@@ -34,7 +36,7 @@ class ReservationsPage extends StatelessWidget {
                       return Theme(
                         data: ThemeData.light().copyWith(
                           primaryColor: Colors.black,
-                          colorScheme: ColorScheme.light(
+                          colorScheme: const ColorScheme.light(
                             primary: Colors.black,
                             onPrimary: Colors.white,
                             onSurface: Colors.black,
@@ -49,14 +51,15 @@ class ReservationsPage extends StatelessWidget {
                         child: child!,
                       );
                     },
-                    firstDate: DateTime.now().subtract(Duration(days: 365)),
+                    firstDate:
+                        DateTime.now().subtract(const Duration(days: 365)),
                     lastDate: DateTime.now());
                 if (pickedDate != null) {
                   reservationController.isByDate(true);
                   reservationController.pickedDate(pickedDate.toString());
                 }
               },
-              icon: Icon(FeatherIcons.calendar))
+              icon: const Icon(FeatherIcons.calendar))
         ],
       ),
       body: Obx(() {
@@ -82,9 +85,8 @@ class ReservationsPage extends StatelessWidget {
             }
 
             if (result.hasException) {
-              return Center(
-                child: Text(result.exception.toString()),
-              );
+                           return ErrorPage(refetch: refetch);
+
             }
 
             final List<Reservation> reservations = (result.data![
@@ -95,6 +97,13 @@ class ReservationsPage extends StatelessWidget {
                 .toList()
                 .reversed
                 .toList();
+            return const EmptyImage(
+                message: "It seems you don't have any trip history yet.");
+
+            if (reservations.isEmpty) {
+              return const EmptyImage(
+                  message: "It seems you don't have any trip history yet.");
+            }
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),

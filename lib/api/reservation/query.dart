@@ -111,14 +111,30 @@ String getReservationByIdQuery = """
 """;
 
 String checkIfReservationUserHasReviewedQuery = """
-  query CheckIfReservationUserHasReviewed(\$userId: ID) {
-    checkIfReservationUserHasReviewed(user_id: \$userId)
+  query CheckIfReservationUserHasReviewed(\$userId: ID,\$reservationId: ID) {
+    checkIfReservationUserHasReviewed(user_id: \$userId,reservation_id:\$reservationId)
   }
 """;
 
-String searchReservationVehicleQuery = """
-  query SearchReservationVehicle(\$vehicleModel: String!) {
-    searchReservationVehicle(vehicle_model: \$vehicleModel) {
+// String searchReservationVehicleQuery = """
+//   query SearchReservationVehicle(\$vehicleModel: String!) {
+//     searchReservationVehicle(vehicle_model: \$vehicleModel) {
+//       reservation_vehicle_make_id
+//       vehicle_make
+//       vehicle_model
+//       capacity
+//       service_fee
+//       driver_commission
+//       initial_trip_fare
+//       vehicle_logo
+//       is_saved
+//     }
+//   }
+// """;
+
+const String searchReservationVehicleQuery = '''
+  query SearchReservationVehicle(\$vehicleModel: String,\$userId:ID) {
+    searchReservationVehicle(vehicle_model: \$vehicleModel,user_id:\$userId) {
       reservation_vehicle_make_id
       vehicle_make
       vehicle_model
@@ -128,6 +144,7 @@ String searchReservationVehicleQuery = """
       initial_trip_fare
       vehicle_logo
       is_saved
+      is_highly_rated
     }
   }
-""";
+''';

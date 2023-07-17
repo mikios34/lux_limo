@@ -84,6 +84,24 @@ class PlaceController extends GetxController {
     }
   }
 
+  Future<num> fetchDistanceAndDuration(
+      LatLng originLatLng, LatLng destinationsLatLng, LatLng? stop) async {
+    // distanceLoading(true);
+    try {
+      final response = await placeDataProvider.fetchDistanceAndDuration(
+          originLatLng, destinationsLatLng, stop);
+
+      // placeDetail.value = response;
+      // distanceLoading(false);
+
+      return response;
+    } catch (e) {
+      // showErrorSnackBar(message: "Connection Error");
+      // distanceLoading(false);
+      return throw Exception(e);
+    }
+  }
+
   Future<Direction> getDirection() async {
     try {
       final directions =

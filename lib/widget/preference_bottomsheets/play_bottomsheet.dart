@@ -71,7 +71,7 @@ class _PlayBottomSheetState extends State<PlayBottomSheet> {
               topRight: Radius.circular(16.0),
             ),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -93,7 +93,8 @@ class _PlayBottomSheetState extends State<PlayBottomSheet> {
                 "Play",
                 style: GoogleFonts.inter(
                     letterSpacing: 0.6,
-                    fontSize: 25,
+                    fontSize: 23,
+                    color: Colors.black,
                     fontWeight: FontWeight.w300),
               ),
               const SizedBox(
@@ -116,13 +117,13 @@ class _PlayBottomSheetState extends State<PlayBottomSheet> {
                           itemCount: data.length,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                                  childAspectRatio: 1.4, crossAxisCount: 3),
+                                  childAspectRatio: 1.2, crossAxisCount: 3),
                           itemBuilder: (context, index) => Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    height: 55,
-                                    width: 55,
+                                    height: 65,
+                                    width: 65,
                                     decoration: BoxDecoration(
                                         color: Colors.white,
                                         shape: BoxShape.circle,
@@ -168,7 +169,7 @@ class _PlayBottomSheetState extends State<PlayBottomSheet> {
                     }),
               ),
               const SizedBox(
-                height: 40,
+                height: 10,
               ),
             ],
           ),

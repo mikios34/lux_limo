@@ -27,6 +27,11 @@ class HomePageController extends GetxController {
   final stopeTextEditingController = TextEditingController();
   final destinationTextEditingController = TextEditingController();
 
+  final _distance = Rxn<num>();
+
+  num? get distance => _distance.value;
+  set distance(num? distance) => _distance.value = distance;
+
   final _pickup = Rxn<PlaceDetail>();
 
   PlaceDetail? get pickup => _pickup.value;

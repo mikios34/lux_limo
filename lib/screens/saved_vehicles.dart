@@ -1,77 +1,75 @@
-import 'package:beyride/model/vehicle.dart';
+import 'package:beyride/api/vehicle/query.dart';
 import 'package:beyride/model/vehicle_make/vehicle_make.dart';
+import 'package:beyride/screens/vehicle/widget/vehicle_card.dart';
+import 'package:beyride/util/empty_card.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:beyride/widget/date_bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class SavedVehicles extends StatelessWidget {
-  // PlaceController placeController = Get.find();
-  final List<List<VehicleMake>>? catvehicles;
-  final List<VehicleMake>? vehicles;
-
-  SavedVehicles({
+  const SavedVehicles({
     super.key,
-    this.vehicles,
-    this.catvehicles,
   });
   @override
   Widget build(BuildContext context) {
-    final List<VehicleMake> flattenedList = catvehicles != null
-        ? catvehicles!
-            .expand((element) => element)
-            .where((element) => element.isSaved == true)
-            .toList()
-        : vehicles!.where((element) => element.isSaved == true).toList();
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
-        toolbarHeight: 70,
-        title: Text(
-          "Saved Vehicles",
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w500,
-            fontSize: 20,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          toolbarHeight: 70,
+          title: const Text(
+            "Saved Vehicles",
+          ),
+          leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(Icons.arrow_back_ios_new),
             color: Colors.black,
           ),
         ),
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
+        body: Query(
+          options: QueryOptions(
+              fetchPolicy: FetchPolicy.cacheAndNetwork,
+              document: gql(reservationSavedVehicleQuery),
+              variables: {"userId": GetStorage().read("uid")}),
+          builder: (result, {fetchMore, refetch}) {
+            if (result.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                ),
+              );
+            }
+            if (result.hasException) {
+              return ErrorPage(refetch: refetch);
+            }
+
+            List<VehicleMake> vehicles =
+                (result.data!['getReservationSavedVehicle'] as List)
+                    .map((e) => VehicleMake.fromJson(e))
+                    .toList();
+
+            if (vehicles.isEmpty) {
+              return const EmptyImage(
+                  message: "It seems you don't have saved any vehicle yet.");
+            }
+            return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return VehicleCard(vehicle: vehicles[index]);
+                  },
+                  itemCount: vehicles.length,
+                ));
           },
-          icon: const Icon(Icons.arrow_back_ios_new),
-          color: Colors.black,
-        ),
-      ),
-      body: flattenedList.isEmpty
-          ? const Center(
-              child: Text("Empty"),
-            )
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return _buildVehicleCard(flattenedList[index], context);
-                },
-                itemCount: flattenedList.length,
-              )
-
-              // [
-              //   ListView.builder(
-              //     shrinkWrap: true,
-              //     itemBuilder: (context, index) {
-              //       return _buildVehicleCard(SavedVehicles[index], context);
-              //     },
-              //     itemCount: SavedVehicles.length,
-              //   ),
-              // ],
-
-              ),
-    );
+        ));
   }
 
   _buildVehicleCard(VehicleMake vehicle, BuildContext context) {
@@ -163,9 +161,6 @@ class SavedVehicles extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-              right: 0,
-              child: IconButton(onPressed: () {}, icon: Icon(Icons.favorite)))
         ],
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:beyride/api/preference/query.dart';
 import 'package:beyride/controller/bottomsheet_controller.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,7 +27,7 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Padding(
@@ -38,8 +39,8 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                   'Preference',
                   style: GoogleFonts.inter(
                     color: Colors.black,
-                    fontSize: 25,
-                    letterSpacing: 0.4,
+                    fontSize: 23,
+                    letterSpacing: 0.8,
                     fontWeight: FontWeight.w300,
                   ),
                 ),
@@ -62,11 +63,11 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 20,
-          ),
-          Divider(),
-          const SizedBox(
             height: 10,
+          ),
+          const Divider(),
+          const SizedBox(
+            height: 20,
           ),
           Query(
               options:
@@ -74,7 +75,7 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
               builder: (result, {fetchMore, refetch}) {
                 if (result.isLoading) {
                   return const Padding(
-                    padding: const EdgeInsets.all(38.0),
+                    padding: EdgeInsets.all(38.0),
                     child: Center(
                       child: CircularProgressIndicator(
                         color: Colors.black,
@@ -83,16 +84,15 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                   );
                 }
                 if (result.hasException) {
-                  return Center(
-                    child: Text("Error is ${result.exception}"),
-                  );
+                  return ErrorPage(refetch: refetch);
                 }
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: ListView.separated(
                       shrinkWrap: true,
                       separatorBuilder: (context, index) => const Padding(
-                            padding: EdgeInsets.only(left: 60.0),
+                            padding:
+                                EdgeInsets.only(left: 60.0, top: 5, bottom: 5),
                             child: Divider(),
                           ),
                       itemBuilder: (context, index) => MaterialButton(
@@ -103,8 +103,8 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                             child: Row(
                               children: [
                                 Container(
-                                  width: 54.0,
-                                  height: 54.0,
+                                  width: 50.0,
+                                  height: 50.0,
                                   decoration: BoxDecoration(
                                     color: Theme.of(context).primaryColorDark,
                                     shape: BoxShape.circle,
@@ -120,6 +120,7 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                                                     ? Icons.shopping_bag_rounded
                                                     : Icons.storefront_rounded,
                                         color: Colors.black,
+                                        size: 30,
                                       )),
                                 ),
                                 const SizedBox(
@@ -140,15 +141,15 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                                                     prefernnces[index],
                                     style: GoogleFonts.inter(
                                         color: Colors.black,
-                                        fontSize: 15,
+                                        fontSize: 14,
                                         letterSpacing: 1.2,
                                         fontWeight: FontWeight.w400),
                                   );
                                 }),
-                                Spacer(),
-                                Icon(
+                                const Spacer(),
+                                const Icon(
                                   Icons.arrow_forward_ios,
-                                  size: 18,
+                                  size: 15,
                                 )
                               ],
                             ),
@@ -156,7 +157,7 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                       itemCount: 4),
                 );
               }),
-          SizedBox(
+          const SizedBox(
             height: 50,
           ),
           Padding(
@@ -165,9 +166,9 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                 onPressed: () {
                   bottomSheetController.currentIndex = 2;
                 },
-                child: Text("Set Preference")),
+                child: const Text("Set Preference")),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Padding(
@@ -183,7 +184,7 @@ class VehiclePrefernceBottomsheet extends StatelessWidget {
                   bottomSheetController.drink = null;
                   bottomSheetController.currentIndex = 2;
                 },
-                child: Text("Skip")),
+                child: const Text("Skip")),
           ),
         ],
       ),

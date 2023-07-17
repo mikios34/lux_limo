@@ -1,14 +1,12 @@
-import 'package:beyride/api/query.dart';
-import 'package:beyride/model/vehicle.dart';
-import 'package:beyride/screens/trash/booking_detail.dart';
+import 'package:beyride/api/reservation/query.dart';
+import 'package:beyride/model/vehicle_make/vehicle_make.dart';
+import 'package:beyride/screens/vehicle/widget/vehicle_card.dart';
+import 'package:beyride/util/error_page.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:intl/intl.dart';
 
 class SearchResrvation extends StatefulWidget {
   const SearchResrvation({
@@ -99,8 +97,8 @@ class _SearchResrvationState extends State<SearchResrvation> {
       ),
       body: Query(
         options: QueryOptions(
-            document: gql(searchReservationsByReceiptNumber),
-            variables: {"receipt_number": keyword}),
+            document: gql(searchReservationVehicleQuery),
+            variables: {"vehicleModel": keyword}),
         builder: (result, {fetchMore, refetch}) {
           if (result.isLoading) {
             return const Center(
@@ -109,23 +107,19 @@ class _SearchResrvationState extends State<SearchResrvation> {
             ));
           }
           if (result.hasException) {
-            return Center(
-              child: Text("Exception"),
-            );
+                        return ErrorPage(refetch: refetch);
+
           }
 
-          final data =
-              (result.data!['searchReservationsByReceiptNumber'] as List);
+          final List<VehicleMake> vehicles =
+              (result.data!['searchReservationVehicle'] as List)
+                  .map((e) => VehicleMake.fromJson(e))
+                  .toList();
           return ListView.separated(
-              itemBuilder: (context, index) => ListTile(
-                    title: Text(data[index]['pickup']),
-                    subtitle: Text(data[index]['dropoff']),
-                    trailing: Text(DateFormat.MEd().format(
-                        DateTime.fromMillisecondsSinceEpoch(
-                            int.parse(data[index]['date'])))),
-                  ),
-              separatorBuilder: (context, index) => Divider(),
-              itemCount: data.length);
+              itemBuilder: (context, index) =>
+                  VehicleCard(vehicle: vehicles[index], refetch: refetch),
+              separatorBuilder: (context, index) => const Divider(),
+              itemCount: vehicles.length);
         },
       ),
     );

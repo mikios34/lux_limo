@@ -237,7 +237,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           showDialog(
                             context: context,
                             builder: (context) =>
-                                const LoadinProgressIndicator(),
+                                LinearLoadingProgressIndicator(),
                           );
                           if (_image != null) {
                             final imageUrl =

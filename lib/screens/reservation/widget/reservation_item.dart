@@ -6,8 +6,6 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 class ReservationItem extends StatelessWidget {
   final Reservation reserevation;
@@ -27,7 +25,7 @@ class ReservationItem extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-              blurRadius: 2,
+              blurRadius: 7,
               spreadRadius: 3,
               color: Colors.grey.shade200,
               offset: const Offset(0, 0))
@@ -49,28 +47,25 @@ class ReservationItem extends StatelessWidget {
                     getDatefromDateTime(reserevation.date!),
                     style: GoogleFonts.inter(
                         color: Colors.black,
-                        fontSize: 16,
-                        letterSpacing: 0.6,
+                        fontSize: 14,
+                        letterSpacing: 0.9,
                         fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 4,
                   ),
                   Text(
                     getTimefromDateTime(reserevation.date!),
                     style: GoogleFonts.inter(
                         color: Colors.black,
-                        fontSize: 16,
-                        letterSpacing: 0.6,
+                        fontSize: 14,
+                        letterSpacing: 0.9,
                         fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
-              Image.network(height: 60, reserevation.vehicleMake!.vehicleLogo!)
+              Image.network(height: 65, reserevation.vehicleMake!.vehicleLogo!)
             ],
-          ),
-          const SizedBox(
-            height: 17,
           ),
           Container(
             decoration: BoxDecoration(
@@ -84,11 +79,11 @@ class ReservationItem extends StatelessWidget {
                   // mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                           color: Theme.of(context).primaryColorDark,
                           shape: BoxShape.circle),
-                      child: Icon(
+                      child: const Icon(
                         Icons.location_pin,
                         size: 20,
                       ),
@@ -101,16 +96,18 @@ class ReservationItem extends StatelessWidget {
                       reserevation.pickup!,
                       style: GoogleFonts.inter(
                           color: Colors.black,
-                          fontSize: 14,
-                          letterSpacing: 0.6,
+                          fontSize: 12,
+                          letterSpacing: 1.6,
                           fontWeight: FontWeight.w300),
                     ))
                   ],
                 ),
                 Container(
                   height: 15,
-                  margin: const EdgeInsets.only(left: 20, top: 6, bottom: 6),
-                  child: DottedLine(
+                  margin: const EdgeInsets.only(
+                    left: 18,
+                  ),
+                  child: const DottedLine(
                     direction: Axis.vertical,
                     alignment: WrapAlignment.center,
                     lineLength: 10,
@@ -128,7 +125,7 @@ class ReservationItem extends StatelessWidget {
                     // mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                             color: Theme.of(context).primaryColorDark,
                             shape: BoxShape.circle),
@@ -146,14 +143,16 @@ class ReservationItem extends StatelessWidget {
                         style: GoogleFonts.inter(
                             color: Colors.black,
                             fontSize: 12,
-                            letterSpacing: 0.6,
+                            letterSpacing: 1.6,
                             fontWeight: FontWeight.w300),
                       ))
                     ],
                   ),
                   Container(
                     height: 15,
-                    margin: const EdgeInsets.only(left: 20, top: 6, bottom: 6),
+                    margin: const EdgeInsets.only(
+                      left: 18,
+                    ),
                     child: const DottedLine(
                       direction: Axis.vertical,
                       alignment: WrapAlignment.center,
@@ -172,11 +171,11 @@ class ReservationItem extends StatelessWidget {
                   // mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                           color: Theme.of(context).primaryColorDark,
                           shape: BoxShape.circle),
-                      child: Icon(
+                      child: const Icon(
                         Icons.location_pin,
                         size: 20,
                       ),
@@ -189,8 +188,8 @@ class ReservationItem extends StatelessWidget {
                       reserevation.dropoff!,
                       style: GoogleFonts.inter(
                           color: Colors.black,
-                          fontSize: 14,
-                          letterSpacing: 0.6,
+                          fontSize: 12,
+                          letterSpacing: 1.6,
                           fontWeight: FontWeight.w300),
                     ))
                   ],
@@ -199,24 +198,20 @@ class ReservationItem extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 17,
+            height: 10,
           ),
           if (reserevation.status != "Complete")
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                  onPressed: () {
-                    Get.to(ReservationTrackerPage(reservation: reserevation));
-                  },
-                  child: const Text("Track Reservation")),
-            ),
+            ElevatedButton(
+                onPressed: () {
+                  Get.to(ReservationTrackerPage(reservation: reserevation));
+                },
+                child: const Text("Track Reservation")),
           if (reserevation.status == "Complete")
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
                   backgroundColor: Theme.of(context).primaryColorDark,
                   foregroundColor: Colors.black,
-                  minimumSize: const Size.fromHeight(45),
                 ),
                 onPressed: () {
                   Get.to(() => ReservationDetail(reserevation: reserevation));

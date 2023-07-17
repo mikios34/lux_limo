@@ -1,11 +1,8 @@
-import 'package:beyride/api/query.dart';
 import 'package:beyride/model/reservation/reservation.dart';
 import 'package:beyride/util/util.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 class UpcomingEvents extends StatelessWidget {
   const UpcomingEvents({super.key, required this.reservations});
@@ -14,7 +11,7 @@ class UpcomingEvents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 35),
+      padding: const EdgeInsets.only(top: 35),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -31,9 +28,9 @@ class UpcomingEvents extends StatelessWidget {
             height: 10,
           ),
           ListView.separated(
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
               itemBuilder: (context, index) => Container(
                     // margin: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
@@ -46,7 +43,7 @@ class UpcomingEvents extends StatelessWidget {
                       // ],
                       border: Border.all(color: Colors.black, width: 0.1),
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     padding: const EdgeInsets.symmetric(
                         vertical: 21, horizontal: 16.0),
@@ -65,20 +62,20 @@ class UpcomingEvents extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Row(
                           // mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                   color: Theme.of(context).primaryColorDark,
                                   shape: BoxShape.circle),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.location_pin,
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                             const SizedBox(
@@ -87,10 +84,12 @@ class UpcomingEvents extends StatelessWidget {
                             Flexible(
                                 child: Text(
                               reservations[index].pickup!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                               style: GoogleFonts.inter(
                                   color: Colors.black,
                                   fontSize: 12,
-                                  letterSpacing: 0.6,
+                                  letterSpacing: 1.2,
                                   fontWeight: FontWeight.w300),
                             ))
                           ],
@@ -98,7 +97,8 @@ class UpcomingEvents extends StatelessWidget {
                         Container(
                           height: 15,
                           margin: const EdgeInsets.only(
-                              left: 20, top: 6, bottom: 6),
+                            left: 17,
+                          ),
                           child: const DottedLine(
                             direction: Axis.vertical,
                             alignment: WrapAlignment.center,
@@ -117,7 +117,7 @@ class UpcomingEvents extends StatelessWidget {
                             // mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                     color: Theme.of(context).primaryColorDark,
                                     shape: BoxShape.circle),
@@ -127,11 +127,13 @@ class UpcomingEvents extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(
-                                width: 20,
+                                width: 18,
                               ),
                               Flexible(
                                   child: Text(
                                 reservations[index].stop!,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                                 style: GoogleFonts.inter(
                                     color: Colors.black,
                                     fontSize: 12,
@@ -143,7 +145,7 @@ class UpcomingEvents extends StatelessWidget {
                           Container(
                             height: 15,
                             margin: const EdgeInsets.only(
-                                left: 20, top: 6, bottom: 6),
+                                left: 17, top: 6, bottom: 6),
                             child: const DottedLine(
                               direction: Axis.vertical,
                               alignment: WrapAlignment.center,
@@ -162,13 +164,13 @@ class UpcomingEvents extends StatelessWidget {
                           // mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                   color: Theme.of(context).primaryColorDark,
                                   shape: BoxShape.circle),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.location_pin,
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                             const SizedBox(
@@ -177,6 +179,8 @@ class UpcomingEvents extends StatelessWidget {
                             Flexible(
                                 child: Text(
                               reservations[index].dropoff!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                               style: GoogleFonts.inter(
                                   color: Colors.black,
                                   fontSize: 12,
@@ -189,8 +193,7 @@ class UpcomingEvents extends StatelessWidget {
                     ),
                   ),
               separatorBuilder: (context, index) => Container(
-                    padding: EdgeInsets.only(left: 50),
-                    child: Divider(),
+                    height: 10,
                   ),
               itemCount: reservations.length)
         ],

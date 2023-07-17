@@ -1,15 +1,13 @@
 import 'dart:io';
 
 import 'package:beyride/model/reservation/reservation.dart';
-import 'package:beyride/model/vehicle.dart';
+import 'package:beyride/screens/reservation_detail/resrevation_detail.dart';
 import 'package:beyride/util/loading_progress_indicator.dart';
 import 'package:beyride/util/pdf_notification_helper.dart';
 import 'package:beyride/util/util.dart';
 import 'package:beyride/widget/mail_address_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,43 +21,41 @@ class RecieptBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              width: 30.0,
-              height: 30.0,
-              margin: const EdgeInsets.only(right: 16, top: 10),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                    borderRadius: BorderRadius.circular(30.0),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(
-                      Icons.clear,
-                      color: Colors.black,
-                      size: 18,
-                    )),
-              ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: Container(
+            width: 30.0,
+            height: 30.0,
+            margin: const EdgeInsets.only(right: 16, top: 10),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black, width: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                  borderRadius: BorderRadius.circular(30.0),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(
+                    Icons.clear,
+                    color: Colors.black,
+                    size: 18,
+                  )),
             ),
           ),
-          _buildRecieptTypes(Icons.email, "Email Reciept", context, 0),
-          const Divider(),
-          _buildRecieptTypes(Icons.download, "Download Reciept", context, 1),
-          const SizedBox(
-            height: 10,
-          )
-        ],
-      ),
+        ),
+        _buildRecieptTypes(Icons.email, "Email Reciept", context, 0),
+        const Divider(),
+        _buildRecieptTypes(Icons.download, "Download Reciept", context, 1),
+        const SizedBox(
+          height: 10,
+        )
+      ],
     );
   }
 
@@ -69,15 +65,28 @@ class RecieptBottomSheet extends StatelessWidget {
       onTap: () async {
         if (index == 0) {
           Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (BuildContext cont) => MailAddressDialog(),
-          );
+          // showModalBottomSheet(
+          //   context: context,
+          //   builder: (BuildContext cont) {
+          //     return Container(
+          //       child: TextFormField(
+          //         decoration: InputDecoration(hintText: "Testtt"),
+          //       ),
+          //     );
+          //   },
+          // );
+
+          Get.find<ReservationDetailController>().toggleVisibility();
+
+          // showDialog(
+          //   context: context,
+          //   builder: (BuildContext cont) => MailAddressDialog(),
+          // );
         }
         if (index == 1) {
           showDialog(
             context: context,
-            builder: (context) => const LoadinProgressIndicator(),
+            builder: (context) => LinearLoadingProgressIndicator(),
           );
           savePdf(reservation);
           // final pdf = pw.Document();
